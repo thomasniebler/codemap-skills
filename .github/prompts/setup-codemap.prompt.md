@@ -14,11 +14,13 @@ Follow this workflow:
 5. Add a project skill in `.github/skills/` that tells Copilot to analyze a requested submodule by reading the root map, then the nearest submodule map, then only the relevant source files.
 6. Update `.github/copilot-instructions.md` so the map-and-skill workflow is the default way to navigate the repository.
 7. Add or update reusable prompts in `.github/prompts/` only when they help maintain the code-map system.
-8. Validate that links between maps are correct and that the maps reflect the real repository structure.
+8. Add the `maintain-codemap` skill alongside the analysis skill and wire its check script into the repository's normal check task.
+9. Validate that links between maps are correct and that the maps reflect the real repository structure.
 
 Constraints:
 
 - Keep each map scoped to its own directory or submodule.
 - Prefer links to narrower maps over repeating the same content in multiple places.
 - Make the prompt repository-agnostic so it can be copied into other repositories.
+- Keep maps lean: navigation only (purpose, entry points, layout, route/page tables, contracts), within the size budget in the `maintain-codemap` skill; link to docs for behavior.
 - Do not create planning notes outside the requested code-map files and prompt assets.

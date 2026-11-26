@@ -1,0 +1,11 @@
+{
+  "name": "codemap-skills",
+  "owner": { "name": "Thomas Niebler" },
+  "plugins": [
+    {
+      "name": "codemap",
+      "source": "./",
+      "description": "Navigate repositories via hierarchical CODEMAP.md files and keep those maps lean"
+    }
+  ]
+}

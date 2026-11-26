@@ -1,0 +1,9 @@
+{
+  "name": "codemap",
+  "description": "Hierarchical CODEMAP.md navigation and maintenance skills for coding agents",
+  "version": "0.1.0",
+  "author": { "name": "Thomas Niebler" },
+  "license": "MIT",
+  "repository": "https://github.com/thomasniebler/codemap-skills",
+  "skills": "./skills"
+}

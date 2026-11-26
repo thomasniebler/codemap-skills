@@ -1,4 +1,4 @@
-# Copilot CODEMAP Skill
+# CODEMAP Skills
 
 Reusable GitHub Copilot assets for a hierarchical repository navigation workflow built around `CODEMAP.md` files.
 
@@ -15,10 +15,10 @@ Reusable GitHub Copilot assets for a hierarchical repository navigation workflow
 
 ```bash
 # any agent (Copilot, Claude Code, Cursor, ...) via the Agent Skills CLI
-npx skills add thomasniebler/copilot-codemap-skill
+npx skills add thomasniebler/codemap-skills
 
 # Claude Code plugin marketplace
-/plugin marketplace add thomasniebler/copilot-codemap-skill
+/plugin marketplace add thomasniebler/codemap-skills
 /plugin install codemap@codemap-skills
 ```
 

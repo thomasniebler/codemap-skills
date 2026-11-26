@@ -4,6 +4,6 @@
   "version": "0.1.0",
   "author": { "name": "Thomas Niebler" },
   "license": "MIT",
-  "repository": "https://github.com/thomasniebler/copilot-codemap-skill",
+  "repository": "https://github.com/thomasniebler/codemap-skills",
   "skills": "./skills"
 }

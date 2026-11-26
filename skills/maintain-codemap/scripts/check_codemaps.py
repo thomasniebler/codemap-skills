@@ -7,7 +7,9 @@ import re
 import subprocess
 import sys
 
-PATH_RE = re.compile(r"`([A-Za-z0-9_.\-]+(?:/[A-Za-z0-9_.\-]+)+/?)`")
+PATH_RE = re.compile(
+    r"`([A-Za-z0-9_.\-]+(?:/[A-Za-z0-9_.\-]+)+/?|[A-Za-z0-9_\-]+/|[A-Za-z0-9_\-]+\.[A-Za-z0-9]+)`"
+)
 LINK_RE = re.compile(r"\]\((?!https?:|#)([^)#\s]+)")
 
 
@@ -19,8 +21,29 @@ def find_maps(root: pathlib.Path) -> list[pathlib.Path]:
     return sorted(root / p for p in out)
 
 
-def exists(path: str, map_dir: pathlib.Path, root: pathlib.Path) -> bool:
-    return any((base / path).exists() for base in (map_dir, root))
+def tracked_names(root: pathlib.Path) -> set[str]:
+    """Basenames of all files and directories in the repository."""
+    out = subprocess.run(
+        ["git", "ls-files", "--cached", "--others", "--exclude-standard"],
+        cwd=root, capture_output=True, text=True, check=True,
+    ).stdout.split("\n")
+    names: set[str] = set()
+    for line in out:
+        parts = pathlib.PurePosixPath(line).parts
+        names.update(parts)
+    return names
+
+
+def path_exists(path: str, map_dir: pathlib.Path, root: pathlib.Path, names: set[str]) -> bool:
+    """Backticked reference: relative to the map or root; bare names match anywhere."""
+    if any((base / path).exists() for base in (map_dir, root)):
+        return True
+    return "/" not in path.rstrip("/") and path.rstrip("/") in names
+
+
+def link_exists(path: str, map_dir: pathlib.Path) -> bool:
+    """Markdown link: resolved relative to the containing map only."""
+    return (map_dir / path).exists()
 
 
 def main() -> int:
@@ -30,6 +53,7 @@ def main() -> int:
     parser.add_argument("--root-max-lines", type=int, default=100)
     args = parser.parse_args()
     root = args.root.resolve()
+    names = tracked_names(root)
     problems: list[str] = []
     for cm in find_maps(root):
         text = cm.read_text(encoding="utf-8")
@@ -40,18 +64,22 @@ def main() -> int:
             problems.append(f"{rel}: {lines} lines exceeds budget {limit}")
         in_fence = False
         refs: set[str] = set()
+        links: set[str] = set()
         for line in text.splitlines():
             if line.startswith("```"):
                 in_fence = not in_fence
                 continue
             if not in_fence:
                 refs.update(PATH_RE.findall(line))
-            refs.update(LINK_RE.findall(line))
+            links.update(LINK_RE.findall(line))
         for ref in sorted(refs):
             if "*" in ref or "<" in ref:
                 continue
-            if not exists(ref, cm.parent, root):
+            if not path_exists(ref, cm.parent, root, names):
                 problems.append(f"{rel}: missing path {ref}")
+        for link in sorted(links):
+            if not link_exists(link, cm.parent):
+                problems.append(f"{rel}: broken link {link}")
     print("\n".join(problems) or "CODEMAPs OK")
     return 1 if problems else 0
 
